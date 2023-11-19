@@ -55,7 +55,8 @@ t_data %>%
   ggplot(aes(x = t_diff, 
              y = factor(year, levels = seq(2022, 1950, -1)), 
              fill = t_ave)) +
-  geom_density_ridges(bandwidth = 0.3, scale = 3) +
+  geom_density_ridges(bandwidth = 0.3, scale = 3,
+                      size = 0.2, color="white") +
   scale_fill_gradient2(low = "darkblue", mid = "white", high = "darkred",
                        midpoint = 0, guide = "none") +
   coord_cartesian(xlim=c(-5, 5)) +
@@ -63,6 +64,23 @@ t_data %>%
   scale_y_discrete(breaks = seq(1950, 2020, 10)) +
   labs(y = NULL,
        x = "Temperature anomaly (\u00B0C)",
-       title = "Land Temperature Anomaly Distribution")
+       title = "Land Temperature Anomaly Distribution") +
+  theme(
+    text = element_text(color="white"),
+    panel.background = element_rect(fill = "black"),
+    plot.background = element_rect(fill = "black"),
+    panel.grid = element_blank(),
+    axis.text = element_text(color = "white"),
+    axis.ticks = element_line(color = "white"),
+    axis.ticks.y = element_blank(),
+    axis.line.x = element_line(color = "white"),
+    axis.line.y = element_blank()
+  )
 
 ggsave("figures/temp_distribution.png", height = 6, width = 4)
+
+# Close connection
+nc_close(nc_data)
+# Unlink/remove files
+unlink("gistemp250_GHCNv4.nc")
+unlink("gistemp250_GHCNv4.txt")
