@@ -7,7 +7,7 @@ inventory_url <- "https://www.ncei.noaa.gov/pub/data/ghcn/daily/ghcnd-inventory.
 inventory <- read_table(inventory_url,
            col_names = c("station", "lat", "lon", "variable", "start", "end"))
 
-# coordinates for pats house
+# coordinates for Dexter, MI
 my_lat <- 42.33832 * 2 * pi/360
 my_lon <- -83.88938 * 2 * pi/360
 
