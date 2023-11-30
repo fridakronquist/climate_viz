@@ -30,12 +30,55 @@ my_station <- inventory %>%
 station_daily <- glue("https://www.ncei.noaa.gov/pub/data/ghcn/daily/by_station/{my_station}.csv.gz")
 
 local_weather <- read_csv(station_daily,
-  col_names = c("station", "date", "variable", "value", "a", "b", "c", "d")
-) %>%
+  col_names = c("station", "date", "variable", "value", "a", "b", "c", "d")) %>%
   select(date, variable, value) %>%
   pivot_wider(
     names_from = "variable", values_from = "value",
-    values_fill = 0
-  ) %>%
+    values_fill = 0) %>%
   select(date, TMAX, PRCP, SNOW) %>%
-  mutate(date = ymd(date))
+  mutate(date = ymd(date),
+         TMAX = TMAX /10,
+         PRCP = PRCP / 10) %>%
+  rename_all(tolower) %>%
+  # remove outliers
+  #  filter(prcp < 200) %>% # removes whole row 
+  mutate(snow = if_else(snow < 500, snow, NA_real_),
+         prcp = if_else(prcp < 200, prcp, NA_real_)) # only removes snow value, not row
+
+# Check for outliers
+# tmax
+local_weather %>%
+  ggplot(aes(x=date, y=tmax)) +
+  geom_line()
+
+local_weather %>%
+  ggplot(aes(x = tmax)) +
+  geom_histogram(binwidth = 2.5)
+
+# prcp
+local_weather %>%
+  ggplot(aes(x=date, y=prcp)) +
+  geom_line()
+
+local_weather %>%
+  slice_max(n=5, prcp)
+
+local_weather %>%
+  ggplot(aes(x = prcp)) +
+  geom_histogram() +
+  scale_y_continuous(limits = c(0, 50))
+
+# snow
+local_weather %>%
+  ggplot(aes(x=date, y=snow)) +
+  geom_line()
+
+local_weather %>%
+  slice_max(n=5, snow)
+
+local_weather %>%
+  ggplot(aes(x = snow)) +
+  geom_histogram() +
+  scale_y_continuous(limits = c(0, 50))
+
+
